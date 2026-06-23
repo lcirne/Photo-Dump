@@ -27,7 +27,7 @@ load_dotenv(BASE_DIR / ".env")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv(
     "DJANGO_SECRET_KEY",
-    "django-insecure-)g@yovd-ix^ztt=96$iy92w%awg%!=mh3=81)se$my%cdytj6c",
+    "django-secure(g@yovdyix^ztt=96aewrq984-mh!@3r2f@#hT4-",
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
