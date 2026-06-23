@@ -1,4 +1,5 @@
 import hashlib
+import logging
 
 from django.db import transaction
 
@@ -13,6 +14,8 @@ ALLOWED_IMAGE_TYPES = {
     "image/heic",
     "image/heif",
 }
+
+logger = logging.getLogger(__name__)
 
 
 class UploadValidationError(ValueError):
@@ -57,7 +60,7 @@ def enqueue_media_processing(photo_id: int) -> None:
 
         process_photo_upload.delay(photo_id)
     except Exception:
-        # Local development can run without Redis/Celery; records still exist immediately.
+        logger.exception("Failed to enqueue media processing for photo_id=%s", photo_id)
         return
 
 
