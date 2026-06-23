@@ -11,6 +11,10 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/tsconfig.tsbuildinfo
 downloads/
 eggs/
 .eggs/
