@@ -55,6 +55,13 @@ The data model is also structured for future product growth. Albums, photos, and
 - Checksum-based deduplication foundation
 - Deployment split across frontend, API, database, storage, Redis, and worker services
 
+## Upcoming Features
+
+- Photo deletion
+- Album deletion
+- Bulk import
+- Export directly to photos library on ios
+
 ## Future Direction
 
 The next major milestone is a desktop importer for SD cards using Tauri, React, and TypeScript. The desktop app will consume the same Django API rather than duplicating backend logic, preserving the API-first architecture while improving the ingestion experience for camera-first workflows.
