@@ -1,63 +1,60 @@
 # Photo-Dump
 
-Phase 1 implements account auth, albums, image upload, gallery browsing, download URLs, immediate metadata records, and asynchronous image processing hooks.
+Photo-Dump is a utility-first photo management platform for photographers who need a simpler way to move images from dedicated cameras into a modern, cloud-backed library.
 
-## Backend setup
+Live site: https://photo-dump-theta.vercel.app
 
-```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-python manage.py migrate
-python manage.py runserver
-```
+## What It Does
 
-## Production backend commands
+Photo-Dump lets users create an account, upload images, organize them into albums, browse their library, and download originals. The product is intentionally focused on reliable ingestion and synchronization before social features, because the core user problem is getting camera photos off SD cards and into an accessible, organized workflow.
 
-Render can run the Django API with:
+## Why It Is Interesting
 
-```bash
-cd backend && python manage.py migrate && python manage.py collectstatic --noinput
-cd backend && gunicorn home.wsgi:application
-```
+The project is built around a production-style media pipeline rather than a simple file-upload demo. Upload requests create database records immediately, then image processing is delegated to background workers. This keeps API responses fast while allowing expensive work like thumbnail generation, preview creation, metadata extraction, and future deduplication to scale independently.
 
-Run the worker as a separate background worker service:
+The architecture also avoids coupling the application directly to a single storage provider. Media access flows through a service abstraction, and the database stores storage identifiers instead of permanent public URLs. That design makes it possible to move from Supabase Storage to S3-compatible storage, Cloudflare Images, or another provider without rewriting the application’s core business logic.
 
-```bash
-cd backend && celery -A home worker -l info
-```
+## Core Architecture
 
-## Supabase setup
+- React frontend deployed on Vercel
+- Django REST API deployed on Render
+- Supabase Postgres for persistent relational data
+- Supabase Storage for private original images and generated media assets
+- Redis-backed Celery workers for asynchronous image processing
+- Token-based API authentication
+- Signed media URLs generated on demand instead of permanent public links
 
-1. Create a fresh Supabase project.
-2. In Project Settings > Database, copy the pooled Postgres connection string and set it as `DATABASE_URL` in `backend/.env`.
-3. In Project Settings > API, copy the project URL into `SUPABASE_URL`.
-4. Copy the `service_role` key into `SUPABASE_SERVICE_ROLE_KEY`. Keep this server-only.
-5. In Storage, create a private bucket named `photos`.
-6. Set `MEDIA_STORAGE_BACKEND=supabase`.
-7. Run `python manage.py migrate` so Django creates the Phase 1 tables in Supabase Postgres.
+## Implemented Features
 
-The app stores storage keys, not permanent public URLs. API responses generate short-lived URLs through the media service abstraction.
+- User registration and login
+- Authenticated dashboard
+- Album creation and organization
+- Image upload with SHA-256 checksum generation
+- Duplicate-upload protection per user
+- Private object storage using storage keys
+- Signed download URLs for original files
+- Asynchronous thumbnail and preview generation
+- EXIF metadata extraction pipeline
+- Admin-friendly Django data model for users, albums, photos, and metadata
 
-## Worker setup
+## Scalability Decisions
 
-Run Redis locally or point `CELERY_BROKER_URL` at a managed Redis instance.
+Photo-Dump separates user-facing API work from media processing. The API stores upload metadata and queues a Celery job, while workers handle image inspection and derivative generation. This separation prevents long-running image operations from blocking user requests and allows the worker tier to scale independently as upload volume grows.
 
-```bash
-cd backend
-celery -A home worker -l info
-```
+The media service abstraction is another deliberate scalability choice. The application stores `storage_key`, `thumbnail_key`, and `preview_key` values instead of public URLs, keeping storage implementation details isolated from the rest of the system. If media volume or delivery requirements outgrow Supabase Storage, the storage backend can be replaced behind the service interface.
 
-Uploads create `Photo` rows immediately. Thumbnail generation, preview generation, dimensions, and EXIF extraction are handled by the Celery task.
+The data model is also structured for future product growth. Albums, photos, and photo metadata are distinct resources, which leaves room for desktop SD-card import, mobile upload/download, public profiles, and social features without forcing a rewrite of the upload pipeline.
 
-## Frontend setup
+## Technical Highlights
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+- Thin React client consuming an API-first backend
+- Django REST Framework serializers and views kept close to resource boundaries
+- Service-layer media abstraction for provider independence
+- Background worker pipeline for CPU and I/O-heavy media tasks
+- Private storage with short-lived signed URLs
+- Checksum-based deduplication foundation
+- Deployment split across frontend, API, database, storage, Redis, and worker services
 
-Set `VITE_API_BASE_URL=http://localhost:8000/api` if the API is not running on the default local URL.
+## Future Direction
+
+The next major milestone is a desktop importer for SD cards using Tauri, React, and TypeScript. The desktop app will consume the same Django API rather than duplicating backend logic, preserving the API-first architecture while improving the ingestion experience for camera-first workflows.
