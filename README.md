@@ -1,12 +1,12 @@
 # Photo-Dump
 
-Photo-Dump is a utility-first photo management platform for photographers who need a simpler way to move images from dedicated cameras into a modern, cloud-backed library.
+Photo-Dump is a photo management platform for people with digital cameras or multiple devices who need a simpler way to move images into a modern, cloud-backed library.
 
 Live site: https://photo-dump-theta.vercel.app
 
 ## What It Does
 
-Photo-Dump lets users create an account, upload images, organize them into albums, browse their library, and download originals. The product is intentionally focused on reliable ingestion and synchronization before social features, because the core user problem is getting camera photos off SD cards and into an accessible, organized workflow.
+Photo-Dump lets users create an account, upload images, organize them into albums, browse their library, and download originals. The product is intentionally focused on reliable ingestion and synchronization before social features, because the core problem being addressed is low-experiences tech users getting camera photos off SD cards and into an accessible, organized workflow.
 
 ## Why It Is Interesting
 
