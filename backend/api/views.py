@@ -106,5 +106,3 @@ class DashboardView(APIView):
                 },
             }
         )
-
-# Create your views here.
